@@ -150,6 +150,7 @@ public:
    fc::optional<vm_type>            wasm_runtime;
    fc::microseconds                 abi_serializer_max_time_ms;
    fc::optional<bfs::path>          snapshot_path;
+   fc::optional<public_key_type>    replace_producer_keys;
 
 
    // retained references to channels for easy publication
@@ -315,6 +316,7 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
          ("export-reversible-blocks", bpo::value<bfs::path>(),
            "export reversible block database in portable format into specified file and then exit")
          ("snapshot", bpo::value<bfs::path>(), "File to read Snapshot State from")
+         ("replace-producer-keys", bpo::value<string>(), "Replace producer keys")
          ;
 
 }
@@ -1013,6 +1015,10 @@ void chain_plugin::plugin_initialize(const variables_map& options) {
 
       my->chain.emplace( *my->chain_config, std::move(pfs), *chain_id );
 
+      if( options.count( "replace-producer-keys" ) ) {
+         my->replace_producer_keys.emplace( options.at( "replace-producer-keys" ).as<string>() );
+      }
+
       // set up method providers
       my->get_block_by_number_provider = app().get_method<methods::get_block_by_number>().register_provider(
             [this]( uint32_t block_num ) -> signed_block_ptr {
@@ -1088,6 +1094,9 @@ void chain_plugin::plugin_startup()
          my->chain->startup(shutdown, *my->genesis);
       } else {
          my->chain->startup(shutdown);
+      }
+      if (my->replace_producer_keys) {
+         my->chain->replace_producer_keys(*my->replace_producer_keys);
       }
    } catch (const database_guard_exception& e) {
       log_guard_exception(e);

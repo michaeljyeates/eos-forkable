@@ -335,6 +335,8 @@ namespace eosio { namespace chain {
             return pretty_output;
          }
 
+         void replace_producer_keys( const public_key_type& key );
+
       static chain_id_type extract_chain_id(snapshot_reader& snapshot);
 
       static fc::optional<chain_id_type> extract_chain_id_from_db( const path& state_dir );
