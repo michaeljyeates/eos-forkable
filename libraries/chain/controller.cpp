@@ -3153,9 +3153,9 @@ void controller::replace_producer_keys( const public_key_type& key ) {
       gp.proposed_schedule_block_num = {};
       gp.proposed_schedule.clear();
    });
-   my->head->pending_schedule_lib_num = 0;
-   my->head->pending_schedule_hash = {};
-   my->head->pending_schedule = {};
+   my->head->pending_schedule.schedule_lib_num = 0;
+   my->head->pending_schedule.schedule_hash = {};
+   my->head->pending_schedule.schedule = {};
    for (auto& prod: my->head->active_schedule.producers ) {
       ilog("${n}", ("n", prod.producer_name));
       prod.block_signing_key = key;
